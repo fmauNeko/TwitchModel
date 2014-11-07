@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TwitchModel.Models
+﻿namespace TwitchModel.Models
 {
-    class StreamDetails
+    internal class StreamDetails
     {
         public long _id { get; set; }
         public string game { get; set; }

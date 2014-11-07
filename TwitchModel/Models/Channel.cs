@@ -1,6 +1,6 @@
 ﻿namespace TwitchModel.Models
 {
-    class Channel
+    internal class Channel
     {
         public bool mature { get; set; }
         public string status { get; set; }

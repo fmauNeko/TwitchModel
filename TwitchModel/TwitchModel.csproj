@@ -61,6 +61,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Logger.cs" />
     <Compile Include="Models\Channel.cs" />
     <Compile Include="Models\StreamDetails.cs" />
     <Compile Include="Models\Stream.cs" />
