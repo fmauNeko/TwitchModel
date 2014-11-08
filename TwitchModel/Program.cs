@@ -52,6 +52,11 @@ namespace TwitchModel
             return null;
         }
 
+        private static void LogEvent(object sender, WarehouseEvents.ThingEventArgs args)
+        {
+            Logger.Debug(args.Thing.ID + " - " + (args.Thing.Boolean("live") ? "Online" : "Offline"));
+        }
+
         private static void Main()
         {
             BuildANewThingType.ThingTypePropertyBuilder typeStream = BuildANewThingType.Named("Stream")
@@ -59,9 +64,8 @@ namespace TwitchModel
                 .ContainingA.Boolean("live");
 
             var warehouse = new Warehouse();
-            warehouse.Events.OnNew += (sender, args) => Logger.Debug(args.Thing.ID + " - " + args.Thing.Boolean("live"));
-            warehouse.Events.OnUpdate +=
-                (sender, args) => Logger.Debug(args.Thing.ID + " - " + args.Thing.Boolean("live"));
+            warehouse.Events.OnNew += LogEvent;
+            warehouse.Events.OnUpdate += LogEvent;
 
             var client = new Client("TwitchModel", "ws://localhost:8083/", warehouse);
 
