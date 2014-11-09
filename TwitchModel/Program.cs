@@ -39,7 +39,7 @@ namespace TwitchModel
                 client.DefaultRequestHeaders.Add("Client-ID", Configuration.ClientId);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(
-                    new MediaTypeWithQualityHeaderValue("application/vnd.twitchtv.v2+json"));
+                    new MediaTypeWithQualityHeaderValue("application/vnd.twitchtv.v3+json"));
 
                 HttpResponseMessage response = await client.GetAsync("channels/" + broadcaster);
                 if (response.IsSuccessStatusCode)
@@ -60,7 +60,7 @@ namespace TwitchModel
                 client.DefaultRequestHeaders.Add("Client-ID", Configuration.ClientId);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(
-                    new MediaTypeWithQualityHeaderValue("application/vnd.twitchtv.v2+json"));
+                    new MediaTypeWithQualityHeaderValue("application/vnd.twitchtv.v3+json"));
 
                 HttpResponseMessage response = await client.GetAsync("streams/" + broadcaster);
                 if (response.IsSuccessStatusCode)
@@ -86,31 +86,38 @@ namespace TwitchModel
                 taskGetStream.Wait();
 
                 var streamObject = taskGetStream.Result;
-                var live = (streamObject.stream != null);
+                try
+                {
+                    var live = (streamObject.stream != null);
 
-                var taskGetChannel = GetChannel(broadcaster);
-                taskGetChannel.Wait();
+                    var taskGetChannel = GetChannel(broadcaster);
+                    taskGetChannel.Wait();
 
-                if (!live)
-                    streamObject.stream = new StreamDetails { viewers = 0 };
+                    if (!live)
+                        streamObject.stream = new StreamDetails {viewers = 0};
 
-                streamObject.stream.channel = taskGetChannel.Result;
+                    streamObject.stream.channel = taskGetChannel.Result;
 
-                var stream = BuildANewThing.As(TypeStream)
-                    .IdentifiedBy(broadcaster)
-                    .ContainingA.String("avatar", streamObject.stream.channel.logo)
-                    .AndA.String("broadcaster", streamObject.stream.channel.name)
-                    .AndA.String("displayName", streamObject.stream.channel.display_name)
-                    .AndAn.Int("followers", streamObject.stream.channel.followers)
-                    .AndA.String("game", streamObject.stream.channel.game)
-                    .AndA.Boolean("live", live)
-                    .AndA.String("status", streamObject.stream.channel.status)
-                    .AndAn.Int("viewers", streamObject.stream.viewers)
-                    .AndAn.Int("views", streamObject.stream.channel.views);
-                
-                Warehouse.RegisterThing(stream);
+                    var stream = BuildANewThing.As(TypeStream)
+                        .IdentifiedBy(broadcaster)
+                        .ContainingA.String("avatar", streamObject.stream.channel.logo)
+                        .AndA.String("broadcaster", streamObject.stream.channel.name)
+                        .AndA.String("displayName", streamObject.stream.channel.display_name)
+                        .AndAn.Int("followers", streamObject.stream.channel.followers)
+                        .AndA.String("game", streamObject.stream.channel.game)
+                        .AndA.Boolean("live", live)
+                        .AndA.String("status", streamObject.stream.channel.status)
+                        .AndAn.Int("viewers", streamObject.stream.viewers)
+                        .AndAn.Int("views", streamObject.stream.channel.views);
 
-                Client.Send();
+                    Warehouse.RegisterThing(stream);
+
+                    Client.Send();
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e.Message);
+                }
             }, null, 0, 10000);
         }
 
