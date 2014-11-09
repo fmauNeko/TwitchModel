@@ -122,7 +122,10 @@ namespace TwitchModel
             var timers = new Collection<Timer>();
 
             foreach (var broadcaster in Configuration.Broadcasters)
+            {
                 timers.Add(CreateApiUpdateTimer(broadcaster));
+                Thread.Sleep(5000);
+            }
 
             Console.CancelKeyPress += delegate
             {
