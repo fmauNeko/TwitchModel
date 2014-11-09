@@ -82,12 +82,12 @@ namespace TwitchModel
         {
             return new Timer(delegate
             {
-                var taskGetStream = GetStream(broadcaster);
-                taskGetStream.Wait();
-
-                var streamObject = taskGetStream.Result;
                 try
                 {
+                    var taskGetStream = GetStream(broadcaster);
+                    taskGetStream.Wait();
+
+                    var streamObject = taskGetStream.Result;
                     var live = (streamObject.stream != null);
 
                     var taskGetChannel = GetChannel(broadcaster);
