@@ -2,7 +2,7 @@
 {
     internal class Channel
     {
-        public bool mature { get; set; }
+        public object mature { get; set; }
         public string status { get; set; }
         public object broadcaster_language { get; set; }
         public string display_name { get; set; }
