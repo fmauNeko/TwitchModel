@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -119,20 +119,18 @@ namespace TwitchModel
             Warehouse.Events.OnNew += LogEvent;
             Warehouse.Events.OnUpdate += LogEvent;
 
-            var timers = new Collection<Timer>();
+            var timers = new List<Timer>();
 
             foreach (var broadcaster in Configuration.Broadcasters)
             {
-                timers.Add(new Timer(UpdateApi, broadcaster, 5000, 10000));
+                timers.Add(new Timer(UpdateApi, broadcaster, 5000, 30000));
                 Thread.Sleep(1000);
             }
 
             Console.CancelKeyPress += delegate
             {
                 foreach (var t in timers)
-                {
                     t.Dispose();
-                }
 
                 Client.Close();
             };
