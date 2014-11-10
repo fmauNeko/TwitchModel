@@ -15,16 +15,16 @@ namespace TwitchModel
     internal class Program
     {
         private static readonly ThingType TypeStream = BuildANewThingType.Named("Stream")
-                .WhichIs("A Twitch.TV Stream")
-                .ContainingA.String("avatar")
-                .AndA.String("broadcaster")
-                .AndA.String("displayName")
-                .AndAn.Int("followers")
-                .AndA.String("game")
-                .AndA.Boolean("live")
-                .AndA.String("status")
-                .AndAn.Int("viewers")
-                .AndAn.Int("views");
+            .WhichIs("A Twitch.TV Stream")
+            .ContainingA.String("avatar")
+            .AndA.String("broadcaster")
+            .AndA.String("displayName")
+            .AndAn.Int("followers")
+            .AndA.String("game")
+            .AndA.Boolean("live")
+            .AndA.String("status")
+            .AndAn.Int("viewers")
+            .AndAn.Int("views");
 
         private static readonly Warehouse Warehouse = new Warehouse();
 
@@ -42,11 +42,11 @@ namespace TwitchModel
                 client.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue("application/vnd.twitchtv.v3+json"));
 
-                var response = await client.GetAsync("channels/" + broadcaster);
+                HttpResponseMessage response = await client.GetAsync("channels/" + broadcaster);
 
                 if (!response.IsSuccessStatusCode) return null;
 
-                var channel = await response.Content.ReadAsAsync<Channel>();
+                Channel channel = await response.Content.ReadAsAsync<Channel>();
                 return channel;
             }
         }
@@ -61,11 +61,11 @@ namespace TwitchModel
                 client.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue("application/vnd.twitchtv.v3+json"));
 
-                var response = await client.GetAsync("streams/" + broadcaster);
+                HttpResponseMessage response = await client.GetAsync("streams/" + broadcaster);
 
                 if (!response.IsSuccessStatusCode) return null;
 
-                var stream = await response.Content.ReadAsAsync<Stream>();
+                Stream stream = await response.Content.ReadAsAsync<Stream>();
                 return stream;
             }
         }
@@ -77,20 +77,20 @@ namespace TwitchModel
 
         private static async Task UpdateApi(string broadcaster)
         {
-            var streamObject = await GetStream(broadcaster);
+            Stream streamObject = await GetStream(broadcaster);
             if (streamObject == null) return;
 
-            var live = (streamObject.stream != null);
+            bool live = (streamObject.stream != null);
 
-            var channelObject = await GetChannel(broadcaster);
+            Channel channelObject = await GetChannel(broadcaster);
             if (channelObject == null) return;
 
             if (!live)
-                streamObject.stream = new StreamDetails { viewers = 0 };
+                streamObject.stream = new StreamDetails {viewers = 0};
 
             streamObject.stream.channel = channelObject;
 
-            var stream = BuildANewThing.As(TypeStream)
+            BuildANewThing.ThingPropertyBuilder stream = BuildANewThing.As(TypeStream)
                 .IdentifiedBy(broadcaster)
                 .ContainingA.String("avatar", streamObject.stream.channel.logo)
                 .AndA.String("broadcaster", streamObject.stream.channel.name)
@@ -114,14 +114,13 @@ namespace TwitchModel
 
             var timer = new Timer(delegate
             {
-                var tasks = Configuration.Broadcasters.Select(UpdateApi).ToList();
+                List<Task> tasks = Configuration.Broadcasters.Select(UpdateApi).ToList();
                 Task.WaitAll(tasks.ToArray(), 10000);
             }, null, 0, 10000);
 
             Console.CancelKeyPress += delegate
             {
                 timer.Dispose();
-
                 Client.Close();
             };
 
