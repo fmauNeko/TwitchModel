@@ -41,15 +41,13 @@ namespace TwitchModel
                 client.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue("application/vnd.twitchtv.v3+json"));
 
-                HttpResponseMessage response = await client.GetAsync("channels/" + broadcaster);
-                if (response.IsSuccessStatusCode)
-                {
-                    Channel channel = await response.Content.ReadAsAsync<Channel>();
-                    return channel;
-                }
-            }
+                var response = await client.GetAsync("channels/" + broadcaster);
 
-            return null;
+                if (!response.IsSuccessStatusCode) return null;
+
+                var channel = await response.Content.ReadAsAsync<Channel>();
+                return channel;
+            }
         }
 
         private static async Task<Stream> GetStream(string broadcaster)
@@ -62,15 +60,13 @@ namespace TwitchModel
                 client.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue("application/vnd.twitchtv.v3+json"));
 
-                HttpResponseMessage response = await client.GetAsync("streams/" + broadcaster);
-                if (response.IsSuccessStatusCode)
-                {
-                    Stream stream = await response.Content.ReadAsAsync<Stream>();
-                    return stream;
-                }
-            }
+                var response = await client.GetAsync("streams/" + broadcaster);
 
-            return null;
+                if (!response.IsSuccessStatusCode) return null;
+
+                var stream = await response.Content.ReadAsAsync<Stream>();
+                return stream;
+            }
         }
 
         private static void LogEvent(object sender, WarehouseEvents.ThingEventArgs args)
@@ -78,47 +74,44 @@ namespace TwitchModel
             Logger.Debug(args.Thing.ID + " - " + (args.Thing.Boolean("live") ? "Online" : "Offline"));
         }
 
-        private static Timer CreateApiUpdateTimer(string broadcaster)
+        private static void UpdateApi(Object bcaster)
         {
-            return new Timer(delegate
-            {
-                try
-                {
-                    var taskGetStream = GetStream(broadcaster);
-                    taskGetStream.Wait();
+            var broadcaster = (String) bcaster;
 
-                    var streamObject = taskGetStream.Result;
-                    var live = (streamObject.stream != null);
+            var streamTask = GetStream(broadcaster);
+            streamTask.Wait(5000);
 
-                    var taskGetChannel = GetChannel(broadcaster);
-                    taskGetChannel.Wait();
+            var streamObject = streamTask.Result;
+            if (streamObject == null) return;
 
-                    if (!live)
-                        streamObject.stream = new StreamDetails {viewers = 0};
+            var live = (streamObject.stream != null);
 
-                    streamObject.stream.channel = taskGetChannel.Result;
+            var channelTask = GetChannel(broadcaster);
+            channelTask.Wait(5000);
 
-                    var stream = BuildANewThing.As(TypeStream)
-                        .IdentifiedBy(broadcaster)
-                        .ContainingA.String("avatar", streamObject.stream.channel.logo)
-                        .AndA.String("broadcaster", streamObject.stream.channel.name)
-                        .AndA.String("displayName", streamObject.stream.channel.display_name)
-                        .AndAn.Int("followers", streamObject.stream.channel.followers)
-                        .AndA.String("game", streamObject.stream.channel.game)
-                        .AndA.Boolean("live", live)
-                        .AndA.String("status", streamObject.stream.channel.status)
-                        .AndAn.Int("viewers", streamObject.stream.viewers)
-                        .AndAn.Int("views", streamObject.stream.channel.views);
+            var channelObject = channelTask.Result;
+            if (channelObject == null) return;
 
-                    Warehouse.RegisterThing(stream);
+            if (!live)
+                streamObject.stream = new StreamDetails { viewers = 0 };
 
-                    Client.Send();
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e.Message);
-                }
-            }, null, 0, 10000);
+            streamObject.stream.channel = channelObject;
+
+            var stream = BuildANewThing.As(TypeStream)
+                .IdentifiedBy(broadcaster)
+                .ContainingA.String("avatar", streamObject.stream.channel.logo)
+                .AndA.String("broadcaster", streamObject.stream.channel.name)
+                .AndA.String("displayName", streamObject.stream.channel.display_name)
+                .AndAn.Int("followers", streamObject.stream.channel.followers)
+                .AndA.String("game", streamObject.stream.channel.game)
+                .AndA.Boolean("live", live)
+                .AndA.String("status", streamObject.stream.channel.status)
+                .AndAn.Int("viewers", streamObject.stream.viewers)
+                .AndAn.Int("views", streamObject.stream.channel.views);
+
+            Warehouse.RegisterThing(stream);
+
+            Client.Send();
         }
 
         private static void Main()
@@ -130,8 +123,8 @@ namespace TwitchModel
 
             foreach (var broadcaster in Configuration.Broadcasters)
             {
-                timers.Add(CreateApiUpdateTimer(broadcaster));
-                Thread.Sleep(5000);
+                timers.Add(new Timer(UpdateApi, broadcaster, 5000, 10000));
+                Thread.Sleep(1000);
             }
 
             Console.CancelKeyPress += delegate
