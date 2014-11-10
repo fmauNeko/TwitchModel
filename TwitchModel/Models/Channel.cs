@@ -2,7 +2,9 @@
 {
     internal class Channel
     {
-        public bool mature { get; set; }
+        // ReSharper disable InconsistentNaming
+
+        public object mature { get; set; }
         public string status { get; set; }
         public object broadcaster_language { get; set; }
         public string display_name { get; set; }
@@ -24,5 +26,7 @@
         public int views { get; set; }
         public int followers { get; set; }
         public object _links { get; set; }
+
+        //Resharper restore InconsistentNaming
     }
 }

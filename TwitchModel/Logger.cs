@@ -14,6 +14,17 @@ namespace TwitchModel
             Console.WriteLine(message);
         }
 
+        private static void Print(string level, string message, ConsoleColor foregroundColor)
+        {
+            Console.Write(DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));
+            Console.Write("|");
+            Console.Write(level);
+            Console.Write("|");
+            Console.ForegroundColor = foregroundColor;
+            Console.WriteLine(message);
+            Console.ResetColor();
+        }
+
         public static void Info(string message)
         {
             Print("INFO", message);
@@ -21,7 +32,7 @@ namespace TwitchModel
         
         public static void Debug(string message)
         {
-            Print("DEBUG", message);
+            Print("DEBUG", message, ConsoleColor.Cyan);
         }
         public static void Error(string message)
         {
