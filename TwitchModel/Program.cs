@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -74,22 +75,14 @@ namespace TwitchModel
             Logger.Debug(args.Thing.ID + " - " + (args.Thing.Boolean("live") ? "Online" : "Offline"));
         }
 
-        private static void UpdateApi(Object bcaster)
+        private static async Task UpdateApi(string broadcaster)
         {
-            var broadcaster = (String) bcaster;
-
-            var streamTask = GetStream(broadcaster);
-            streamTask.Wait(5000);
-
-            var streamObject = streamTask.Result;
+            var streamObject = await GetStream(broadcaster);
             if (streamObject == null) return;
 
             var live = (streamObject.stream != null);
 
-            var channelTask = GetChannel(broadcaster);
-            channelTask.Wait(5000);
-
-            var channelObject = channelTask.Result;
+            var channelObject = await GetChannel(broadcaster);
             if (channelObject == null) return;
 
             if (!live)
@@ -119,18 +112,15 @@ namespace TwitchModel
             Warehouse.Events.OnNew += LogEvent;
             Warehouse.Events.OnUpdate += LogEvent;
 
-            var timers = new List<Timer>();
-
-            foreach (var broadcaster in Configuration.Broadcasters)
+            var timer = new Timer(delegate
             {
-                timers.Add(new Timer(UpdateApi, broadcaster, 5000, 30000));
-                Thread.Sleep(1000);
-            }
+                var tasks = Configuration.Broadcasters.Select(UpdateApi).ToList();
+                Task.WaitAll(tasks.ToArray(), 10000);
+            }, null, 0, 10000);
 
             Console.CancelKeyPress += delegate
             {
-                foreach (var t in timers)
-                    t.Dispose();
+                timer.Dispose();
 
                 Client.Close();
             };
