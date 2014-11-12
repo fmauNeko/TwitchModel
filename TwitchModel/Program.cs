@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -42,11 +41,11 @@ namespace TwitchModel
                 client.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue("application/vnd.twitchtv.v3+json"));
 
-                HttpResponseMessage response = await client.GetAsync("channels/" + broadcaster);
+                var response = await client.GetAsync("channels/" + broadcaster);
 
                 if (!response.IsSuccessStatusCode) return null;
 
-                Channel channel = await response.Content.ReadAsAsync<Channel>();
+                var channel = await response.Content.ReadAsAsync<Channel>();
                 return channel;
             }
         }
@@ -61,11 +60,11 @@ namespace TwitchModel
                 client.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue("application/vnd.twitchtv.v3+json"));
 
-                HttpResponseMessage response = await client.GetAsync("streams/" + broadcaster);
+                var response = await client.GetAsync("streams/" + broadcaster);
 
                 if (!response.IsSuccessStatusCode) return null;
 
-                Stream stream = await response.Content.ReadAsAsync<Stream>();
+                var stream = await response.Content.ReadAsAsync<Stream>();
                 return stream;
             }
         }
@@ -77,12 +76,12 @@ namespace TwitchModel
 
         private static async Task UpdateApi(string broadcaster)
         {
-            Stream streamObject = await GetStream(broadcaster);
+            var streamObject = await GetStream(broadcaster);
             if (streamObject == null) return;
 
-            bool live = (streamObject.stream != null);
+            var live = (streamObject.stream != null);
 
-            Channel channelObject = await GetChannel(broadcaster);
+            var channelObject = await GetChannel(broadcaster);
             if (channelObject == null) return;
 
             if (!live)
@@ -90,7 +89,7 @@ namespace TwitchModel
 
             streamObject.stream.channel = channelObject;
 
-            BuildANewThing.ThingPropertyBuilder stream = BuildANewThing.As(TypeStream)
+            var stream = BuildANewThing.As(TypeStream)
                 .IdentifiedBy(broadcaster)
                 .ContainingA.String("avatar", streamObject.stream.channel.logo)
                 .AndA.String("broadcaster", streamObject.stream.channel.name)
@@ -114,7 +113,7 @@ namespace TwitchModel
 
             var timer = new Timer(delegate
             {
-                List<Task> tasks = Configuration.Broadcasters.Select(UpdateApi).ToList();
+                var tasks = Configuration.Broadcasters.Select(UpdateApi).ToList();
                 Task.WaitAll(tasks.ToArray(), 10000);
             }, null, 0, 10000);
 
@@ -124,7 +123,7 @@ namespace TwitchModel
                 Client.Close();
             };
 
-            Thread.Sleep(Timeout.Infinite);
+            (new ManualResetEvent(false)).WaitOne();
         }
     }
 }
