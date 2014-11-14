@@ -52,7 +52,7 @@
     <StartupObject>TwitchModel.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>GlitchIcon_WhiteonPurple.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\GlitchIcon_WhiteonPurple.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
@@ -107,7 +107,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="GlitchIcon_WhiteonPurple.ico" />
+    <Content Include="Resources\GlitchIcon_WhiteonPurple.ico" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">
