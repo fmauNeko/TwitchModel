@@ -3,7 +3,7 @@ using FX.Configuration;
 
 namespace TwitchModel
 {
-    class Configuration : JsonConfiguration
+    internal class Configuration : JsonConfiguration
     {
         public List<string> Broadcasters { get; set; }
 

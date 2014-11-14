@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace TwitchModel
 {
-    class Logger
+    internal class Logger
     {
         private static void Print(string level, string message)
         {
@@ -29,19 +29,22 @@ namespace TwitchModel
         {
             Print("INFO", message);
         }
-        
+
         public static void Debug(string message)
         {
             Print("DEBUG", message, ConsoleColor.Cyan);
         }
+
         public static void Error(string message)
         {
             Print("ERROR", message);
         }
+
         public static void Warn(string message)
         {
             Print("WARNING", message);
         }
+
         public static void Fatal(string message)
         {
             Print("FATAL", message);
