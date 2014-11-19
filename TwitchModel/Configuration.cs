@@ -5,6 +5,8 @@ namespace TwitchModel
 {
     internal class Configuration : JsonConfiguration
     {
+        public List<string> AlwaysOnTop { get; set; } 
+
         public List<string> Broadcasters { get; set; }
 
         public string ClientId { get; set; }

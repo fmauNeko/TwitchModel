@@ -23,7 +23,8 @@ namespace TwitchModel
             .AndA.Boolean("live")
             .AndA.String("status")
             .AndAn.Int("viewers")
-            .AndAn.Int("views");
+            .AndAn.Int("views")
+            .AndA.Boolean("alwaysontop");
 
         private static readonly Warehouse Warehouse = new Warehouse();
 
@@ -99,7 +100,8 @@ namespace TwitchModel
                 .AndA.Boolean("live", live)
                 .AndA.String("status", streamObject.stream.channel.status)
                 .AndAn.Int("viewers", streamObject.stream.viewers)
-                .AndAn.Int("views", streamObject.stream.channel.views);
+                .AndAn.Int("views", streamObject.stream.channel.views)
+                .AndA.Boolean("alwaysontop", Configuration.AlwaysOnTop.Contains(broadcaster));
 
             Warehouse.RegisterThing(stream);
 
