@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchModel", "TwitchModel\TwitchModel.csproj", "{F5787A78-37B9-47B6-BAD9-2728B6EEF0AD}"
 EndProject
 Project("{7CF6DF6D-3B04-46F8-A40B-537D21BCA0B4}") = "TwitchModelDoc", "TwitchModelDoc\TwitchModelDoc.shfbproj", "{D86BD7C8-37C1-4FCE-B216-27741FB70242}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F5787A78-37B9-47B6-BAD9-2728B6EEF0AD} = {F5787A78-37B9-47B6-BAD9-2728B6EEF0AD}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
