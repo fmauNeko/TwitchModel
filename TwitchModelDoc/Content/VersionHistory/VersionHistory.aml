@@ -2,7 +2,7 @@
 <topic id="5de8a3d0-51a5-4f53-97f5-a084d2112116" revisionNumber="1">
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
 		<introduction>
-			<para>The topics in this section describe the various changes made to the [TODO: Project Title] over the
+			<para>The topics in this section describe the various changes made to TwitchModel over the
 life of the project.</para>
 		</introduction>
 
@@ -15,11 +15,6 @@ life of the project.</para>
 					<listItem>
 						<para><link xlink:href="ad528146-3d8c-4da7-9a9e-df9b4923e638" /></para>
 					</listItem>
-
-					<listItem>
-						<para>[TODO: Add links to each specific version page]</para>
-					</listItem>
-
 				</list>
 
 			</content>

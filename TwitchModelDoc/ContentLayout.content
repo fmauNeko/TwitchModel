@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Topics>
-  <Topic id="9f1693e2-e8b5-4f69-9868-021dc19bd8a0" visible="True" isDefault="true" isSelected="true" title="Welcome to the [TODO: Add project name]">
+  <Topic id="9f1693e2-e8b5-4f69-9868-021dc19bd8a0" visible="True" isDefault="true" title="Welcome to TwitchModel">
     <HelpKeywords>
       <HelpKeyword index="K" term="Welcome" />
     </HelpKeywords>
@@ -9,9 +9,9 @@
     <HelpKeywords>
       <HelpKeyword index="K" term="version, history" />
     </HelpKeywords>
-    <Topic id="ad528146-3d8c-4da7-9a9e-df9b4923e638" visible="True" title="Version 1.0.0.0">
+    <Topic id="ad528146-3d8c-4da7-9a9e-df9b4923e638" visible="True" isSelected="true" title="Version 0.1.0">
       <HelpKeywords>
-        <HelpKeyword index="K" term="version, 1.0.0.0" />
+        <HelpKeyword index="K" term="version, 0.1.0" />
       </HelpKeywords>
     </Topic>
   </Topic>

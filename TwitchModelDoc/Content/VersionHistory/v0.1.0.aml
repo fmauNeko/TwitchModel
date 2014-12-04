@@ -2,7 +2,7 @@
 <topic id="ad528146-3d8c-4da7-9a9e-df9b4923e638" revisionNumber="1">
 	<developerConceptualDocument xmlns="http://ddue.schemas.microsoft.com/authoring/2003/5" xmlns:xlink="http://www.w3.org/1999/xlink">
 		<introduction>
-			<para>Version [TODO: Version] was released on [TODO: Date].
+			<para>Version 0.1.0 was released on 10/11/2014.
 			</para>
 		</introduction>
 
@@ -12,7 +12,7 @@
 
 				<list class="bullet">
 					<listItem>
-						<para>[TODO: Add change items here]</para>
+						<para>Initial release.</para>
 					</listItem>
 
 				</list>
