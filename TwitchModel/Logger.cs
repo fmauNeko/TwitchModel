@@ -27,7 +27,9 @@ namespace TwitchModel
         /// </param>
         public static void Debug(string message)
         {
-            Print("DEBUG", message, ConsoleColor.Cyan);
+            #if DEBUG
+                Print("DEBUG", message, ConsoleColor.Cyan);
+            #endif
         }
 
         /// <summary>
