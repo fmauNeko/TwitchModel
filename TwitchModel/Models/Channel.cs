@@ -53,7 +53,7 @@ namespace TwitchModel.Models
         /// <summary>
         /// Gets or sets the delay.
         /// </summary>
-        public int delay { get; set; }
+        public object delay { get; set; }
 
         /// <summary>
         /// Gets or sets the display_name.
