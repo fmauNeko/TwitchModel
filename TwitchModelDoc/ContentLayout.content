@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Topics>
+  <Topic id="9f1693e2-e8b5-4f69-9868-021dc19bd8a0" visible="True" isDefault="true" title="Welcome to TwitchModel">
+    <HelpKeywords>
+      <HelpKeyword index="K" term="Welcome" />
+    </HelpKeywords>
+  </Topic>
+  <Topic id="5de8a3d0-51a5-4f53-97f5-a084d2112116" visible="True" isExpanded="true" title="Version History">
+    <HelpKeywords>
+      <HelpKeyword index="K" term="version, history" />
+    </HelpKeywords>
+    <Topic id="ad528146-3d8c-4da7-9a9e-df9b4923e638" visible="True" isSelected="true" title="Version 0.1.0">
+      <HelpKeywords>
+        <HelpKeyword index="K" term="version, 0.1.0" />
+      </HelpKeywords>
+    </Topic>
+  </Topic>
+</Topics>
