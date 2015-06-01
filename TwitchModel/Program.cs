@@ -146,11 +146,10 @@ namespace TwitchModel
         /// </param>
         private static void OnNewThing(object sender, WarehouseEvents.ThingEventArgs args)
         {
-            if(args.Thing.Type.Is(TypeBroadcaster))
-            {
-                Logger.Debug("New Broadcaster: " + args.Thing.String("broadcaster"));
-                Broadcasters.Add(args.Thing.String("broadcaster"));
-            }
+            if (!args.Thing.Type.Is(TypeBroadcaster) || Broadcasters.Contains(args.Thing.String("broadcaster"))) return;
+
+            Logger.Debug("New Broadcaster: " + args.Thing.String("broadcaster"));
+            Broadcasters.Add(args.Thing.String("broadcaster"));
         }
 
         /// <summary>
@@ -164,10 +163,7 @@ namespace TwitchModel
         /// </param>
         private static void OnUpdatedThing(object sender, WarehouseEvents.ThingEventArgs args)
         {
-            if(args.Thing.Type.Is(TypeStream))
-            {
-                Logger.Debug(args.Thing.ID + " - " + (args.Thing.Boolean("live") ? "Online" : "Offline"));
-            }
+            if (args.Thing.Type.Is(TypeStream)) Logger.Debug(args.Thing.ID + " - " + (args.Thing.Boolean("live") ? "Online" : "Offline"));
         }
 
         /// <summary>
@@ -181,11 +177,10 @@ namespace TwitchModel
         /// </param>
         private static void OnDeletedThing(object sender, WarehouseEvents.ThingEventArgs args)
         {
-            if(args.Thing.Type.Is(TypeBroadcaster))
-            {
-                Logger.Debug("Broadcaster deleted: " + args.Thing.String("broadcaster"));
-                Broadcasters.Remove(args.Thing.String("broadcaster"));
-            }
+            if (!args.Thing.Type.Is(TypeBroadcaster) || !Broadcasters.Contains(args.Thing.String("broadcaster"))) return;
+
+            Logger.Debug("Broadcaster deleted: " + args.Thing.String("broadcaster"));
+            Broadcasters.Remove(args.Thing.String("broadcaster"));
         }
 
         /// <summary>
