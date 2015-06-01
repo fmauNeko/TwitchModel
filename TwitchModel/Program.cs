@@ -6,9 +6,11 @@
 //   The main TwitchModel logic.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace TwitchModel
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
     using System.Net.Http.Headers;
@@ -22,29 +24,29 @@ namespace TwitchModel
     using TwitchModel.Models;
 
     /// <summary>
-    /// The main TwitchModel logic.
+    ///     The main TwitchModel logic.
     /// </summary>
     internal class Program
     {
         #region Static Fields
 
         /// <summary>
-        /// The ThingModel warehouse.
+        ///     The ThingModel warehouse.
         /// </summary>
         private static readonly Warehouse Warehouse = new Warehouse();
 
         /// <summary>
-        /// The ThingModel client.
+        ///     The ThingModel client.
         /// </summary>
         private static readonly Client Client = new Client("TwitchModel", "ws://localhost:8083/", Warehouse);
 
         /// <summary>
-        /// The configuration provider.
+        ///     The configuration provider.
         /// </summary>
         private static readonly Configuration Configuration = new Configuration();
 
         /// <summary>
-        /// The ThingModel stream type definition.
+        ///     The ThingModel stream type definition.
         /// </summary>
         private static readonly ThingType TypeStream =
             BuildANewThingType.Named("Stream")
@@ -58,20 +60,22 @@ namespace TwitchModel
                 .AndA.String("status")
                 .AndAn.Int("viewers")
                 .AndAn.Int("views")
-                .AndA.Boolean("alwaysontop");
+                .AndA.Boolean("alwaysOnTop");
+
+        private static readonly List<string> Broadcasters = new List<string>();
 
         #endregion
 
         #region Methods
 
         /// <summary>
-        /// This method fetches the channel info from Twitch's API, and deserializes it.
+        ///     This method fetches the channel info from Twitch's API, and deserializes it.
         /// </summary>
         /// <param name="broadcaster">
-        /// The broadcaster's account name.
+        ///     The broadcaster's account name.
         /// </param>
         /// <returns>
-        /// An asynchronous <see cref="Task"/> which will return a <see cref="Channel"/> object.
+        ///     An asynchronous <see cref="Task" /> which will return a <see cref="Channel" /> object.
         /// </returns>
         private static async Task<Channel> GetChannel(string broadcaster)
         {
@@ -96,13 +100,13 @@ namespace TwitchModel
         }
 
         /// <summary>
-        /// This method fetches the stream info from Twitch's API, and deserializes it.
+        ///     This method fetches the stream info from Twitch's API, and deserializes it.
         /// </summary>
         /// <param name="broadcaster">
-        /// The broadcaster's account name.
+        ///     The broadcaster's account name.
         /// </param>
         /// <returns>
-        /// An asynchronous <see cref="Task"/> which will return a <see cref="Stream"/> object.
+        ///     An asynchronous <see cref="Task" /> which will return a <see cref="Stream" /> object.
         /// </returns>
         private static async Task<Stream> GetStream(string broadcaster)
         {
@@ -127,35 +131,75 @@ namespace TwitchModel
         }
 
         /// <summary>
-        /// A ThingModel callback event to log the status of the streams.
+        ///     A ThingModel callback event to process new broadcaster requests.
         /// </summary>
         /// <param name="sender">
-        /// The sender.
+        ///     The sender.
         /// </param>
         /// <param name="args">
-        /// The args.
+        ///     The args.
         /// </param>
-        private static void LogEvent(object sender, WarehouseEvents.ThingEventArgs args)
+        private static void OnNewThing(object sender, WarehouseEvents.ThingEventArgs args)
         {
-            Logger.Debug(args.Thing.ID + " - " + (args.Thing.Boolean("live") ? "Online" : "Offline"));
+            if (args.Thing.Type.Name == "Broadcaster")
+            {
+                Logger.Debug("New Broadcaster: " + args.Thing.String("broadcaster"));
+                Broadcasters.Add(args.Thing.String("broadcaster"));
+            }
         }
 
         /// <summary>
-        /// The main method.
+        ///     A ThingModel callback event to log stream status changes.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="args">
+        ///     The args.
+        /// </param>
+        private static void OnUpdatedThing(object sender, WarehouseEvents.ThingEventArgs args)
+        {
+            if (Equals(args.Thing.Type, TypeStream))
+            {
+                Logger.Debug(args.Thing.ID + " - " + (args.Thing.Boolean("live") ? "Online" : "Offline"));
+            }
+        }
+
+        /// <summary>
+        ///     A ThingModel callback event to process broadcaster deletion requests.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="args">
+        ///     The args.
+        /// </param>
+        private static void OnDeletedThing(object sender, WarehouseEvents.ThingEventArgs args)
+        {
+            if (Equals(args.Thing.Type, TypeBroadcaster))
+            {
+                Logger.Debug("Broadcaster deleted: " + args.Thing.String("broadcaster"));
+                Broadcasters.Remove(args.Thing.String("broadcaster"));
+            }
+        }
+
+        /// <summary>
+        ///     The main method.
         /// </summary>
         private static void Main()
         {
-            Warehouse.Events.OnNew += LogEvent;
-            Warehouse.Events.OnUpdate += LogEvent;
+            Warehouse.Events.OnNew += OnNewThing;
+            Warehouse.Events.OnUpdate += OnUpdatedThing;
+            Warehouse.Events.OnDelete += OnDeletedThing;
 
             var timer = new Timer(
                 delegate
                     {
-                        var tasks = Configuration.Broadcasters.Select(UpdateApi).ToList();
-                        Task.WaitAll(tasks.ToArray(), 10000);
-                    }, 
-                null, 
-                0, 
+                        var tasks = Broadcasters.Select(UpdateApi).ToArray();
+                        Task.WaitAll(tasks, 10000);
+                    },
+                null,
+                0,
                 10000);
 
             Console.CancelKeyPress += delegate
@@ -168,13 +212,14 @@ namespace TwitchModel
         }
 
         /// <summary>
-        /// The worker task, which will get the <see cref="Channel"/> and <see cref="Stream"/> objects, and merge them into a thing, before sending it to the ThingModel broker.
+        ///     The worker task, which will get the <see cref="Channel" /> and <see cref="Stream" /> objects, and merge them into a
+        ///     thing, before sending it to the ThingModel broker.
         /// </summary>
         /// <param name="broadcaster">
-        /// The broadcaster's name.
+        ///     The broadcaster's name.
         /// </param>
         /// <returns>
-        /// An asynchronous <see cref="Task"/> without any return value.
+        ///     An asynchronous <see cref="Task" /> without any return value.
         /// </returns>
         private static async Task UpdateApi(string broadcaster)
         {
@@ -211,7 +256,7 @@ namespace TwitchModel
                     .AndA.String("status", streamObject.stream.channel.status)
                     .AndAn.Int("viewers", streamObject.stream.viewers)
                     .AndAn.Int("views", streamObject.stream.channel.views)
-                    .AndA.Boolean("alwaysontop", Configuration.AlwaysOnTop.Contains(broadcaster));
+                    .AndA.Boolean("alwaysOnTop", Configuration.AlwaysOnTop.Contains(broadcaster));
 
             Warehouse.RegisterThing(stream);
 
