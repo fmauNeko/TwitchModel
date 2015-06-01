@@ -59,8 +59,13 @@ namespace TwitchModel
                 .AndA.Boolean("live")
                 .AndA.String("status")
                 .AndAn.Int("viewers")
-                .AndAn.Int("views")
-                .AndA.Boolean("alwaysOnTop");
+                .AndAn.Int("views");
+
+        private static readonly ThingType TypeBroadcaster =
+            BuildANewThingType.Named("Broadcaster")
+                .WhichIs("A Twitch.TV Broadcaster")
+                .ContainingA.String("name", "Name")
+                .WhichIs("The name of the broadcaster");
 
         private static readonly List<string> Broadcasters = new List<string>();
 
@@ -141,7 +146,7 @@ namespace TwitchModel
         /// </param>
         private static void OnNewThing(object sender, WarehouseEvents.ThingEventArgs args)
         {
-            if (args.Thing.Type.Name == "Broadcaster")
+            if(args.Thing.Type.Is(TypeBroadcaster))
             {
                 Logger.Debug("New Broadcaster: " + args.Thing.String("broadcaster"));
                 Broadcasters.Add(args.Thing.String("broadcaster"));
@@ -159,7 +164,7 @@ namespace TwitchModel
         /// </param>
         private static void OnUpdatedThing(object sender, WarehouseEvents.ThingEventArgs args)
         {
-            if (Equals(args.Thing.Type, TypeStream))
+            if(args.Thing.Type.Is(TypeStream))
             {
                 Logger.Debug(args.Thing.ID + " - " + (args.Thing.Boolean("live") ? "Online" : "Offline"));
             }
@@ -176,7 +181,7 @@ namespace TwitchModel
         /// </param>
         private static void OnDeletedThing(object sender, WarehouseEvents.ThingEventArgs args)
         {
-            if (Equals(args.Thing.Type, TypeBroadcaster))
+            if(args.Thing.Type.Is(TypeBroadcaster))
             {
                 Logger.Debug("Broadcaster deleted: " + args.Thing.String("broadcaster"));
                 Broadcasters.Remove(args.Thing.String("broadcaster"));
@@ -255,8 +260,7 @@ namespace TwitchModel
                     .AndA.Boolean("live", live)
                     .AndA.String("status", streamObject.stream.channel.status)
                     .AndAn.Int("viewers", streamObject.stream.viewers)
-                    .AndAn.Int("views", streamObject.stream.channel.views)
-                    .AndA.Boolean("alwaysOnTop", Configuration.AlwaysOnTop.Contains(broadcaster));
+                    .AndAn.Int("views", streamObject.stream.channel.views);
 
             Warehouse.RegisterThing(stream);
 
