@@ -24,6 +24,11 @@ namespace TwitchModel
         /// </summary>
         public string ClientId { get; set; }
 
+        /// <summary>
+        /// Gets or sets the client id.
+        /// </summary>
+        public string ThingModelURI { get; set; }
+
         #endregion
     }
 }
