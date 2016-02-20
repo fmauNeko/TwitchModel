@@ -31,6 +31,11 @@ namespace TwitchModel
         #region Static Fields
 
         /// <summary>
+        ///     The configuration provider.
+        /// </summary>
+        private static readonly Configuration Configuration = new Configuration();
+
+        /// <summary>
         ///     The ThingModel warehouse.
         /// </summary>
         private static readonly Warehouse Warehouse = new Warehouse();
@@ -38,12 +43,7 @@ namespace TwitchModel
         /// <summary>
         ///     The ThingModel client.
         /// </summary>
-        private static readonly Client Client = new Client("TwitchModel", "ws://localhost:8083/", Warehouse);
-
-        /// <summary>
-        ///     The configuration provider.
-        /// </summary>
-        private static readonly Configuration Configuration = new Configuration();
+        private static readonly Client Client = new Client("TwitchModel", Configuration.ThingModelURI, Warehouse);
 
         /// <summary>
         ///     The ThingModel stream type definition.
